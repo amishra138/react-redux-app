@@ -25,6 +25,10 @@ module.exports = {
     https: false,
   },
   plugins: [
+    // Now webpack will replace process.env.API_URL anywhere in our code with the URL we've specified here.
+    new webpack.DefinePlugin({
+      "process.env.API_URL": JSON.stringify("http://localhost:3001"),
+    }),
     new HtmlWebpackPlugin({
       template: "src/index.html",
       facicon: "src/favicon.ico",
