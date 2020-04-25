@@ -6,6 +6,8 @@ import PropsTypes from "prop-types";
 import { bindActionCreators } from "redux";
 import CourseList from "./CourseList";
 import { Redirect } from "react-router-dom";
+import Spinner from "../common/Spinner";
+import { toast } from "react-toastify";
 
 class CoursesPage extends React.Component {
   state = {
@@ -26,20 +28,36 @@ class CoursesPage extends React.Component {
     }
   }
 
+  handleDeleteCourse = (course) => {
+    toast.success("Course deleted!");
+    this.props.actions.deleteCourse(course).catch((error) => {
+      toast.error("Delete fails " + error.message, { autoClose: false });
+    });
+  };
+
   render() {
     return (
       <>
         {this.state.redirectToCoursePage && <Redirect to="/course"></Redirect>}
         <h2>Courses</h2>
-        <button
-          style={{ marginBottom: 20 }}
-          className="btn btn-primary add-course"
-          onClick={() => this.setState({ redirectToCoursePage: true })}
-        >
-          Add Course
-        </button>
+        {this.props.loading ? (
+          <Spinner></Spinner>
+        ) : (
+          <>
+            <button
+              style={{ marginBottom: 20 }}
+              className="btn btn-primary add-course"
+              onClick={() => this.setState({ redirectToCoursePage: true })}
+            >
+              Add Course
+            </button>
 
-        <CourseList courses={this.props.courses} />
+            <CourseList
+              onDeleteClick={this.handleDeleteCourse}
+              courses={this.props.courses}
+            />
+          </>
+        )}
       </>
     );
   }
@@ -48,7 +66,9 @@ class CoursesPage extends React.Component {
 //To allow dispatch as in props
 CoursesPage.prototypes = {
   courses: PropsTypes.array.isRequired,
+  authors: PropsTypes.array.isRequired,
   actions: PropsTypes.object.isRequired,
+  loading: PropsTypes.bool.isRequired,
 };
 
 //be specific to declare state, as it re-renders component if statge changes
@@ -65,6 +85,7 @@ function mapStateToProps(state) {
             };
           }),
     authors: state.authors,
+    loading: state.apiCallsInProgress > 0,
   };
 }
 
@@ -76,6 +97,7 @@ function mapDispatchToProps(dispatch) {
     actions: {
       loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch),
       loadCourses: bindActionCreators(courseActions.loadCourses, dispatch),
+      deleteCourse: bindActionCreators(courseActions.deleteCourse, dispatch),
     },
   };
 }
