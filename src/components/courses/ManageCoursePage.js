@@ -8,7 +8,8 @@ import { newCourse } from "../../../tools/mockData";
 import Spinner from "../common/Spinner";
 import { toast } from "react-toastify";
 
-function ManageCoursePage({
+//by adding export, it donesn't break, it will just export unconnected component and bottom one work as connected component
+export function ManageCoursePage({
   courses,
   authors,
   loadAuthors,
